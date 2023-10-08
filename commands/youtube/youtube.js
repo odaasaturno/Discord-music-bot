@@ -1,56 +1,82 @@
 const { SlashCommandBuilder } = require('discord.js');
-// const { joinVoiceChannel, createAudioResource } = require('@discordjs/voice');
-// const { getVoiceConnection, createAudioPlayer, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
-// const ytdl = require('ytdl-core');
-// const { join } = require('node:path');
+const { joinVoiceChannel, createAudioResource, createAudioPlayer, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
 
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('yt')
-		.setDescription('Plays yt.')
+		.setDescription('Reproduce videos de Youtube')
 		.addStringOption(option =>
 			option
 				.setName('url')
-				.setDescription('Video url')),
+				.setDescription('Url del video')),
 
 	async execute(interaction) {
 		const url = interaction.options.getString('url');
 
-		await interaction.reply('La url es: ' + url);
+		// if it's not a valid URL, stop.
+		if (!ytdl.validateURL(url)) {
+			await interaction.reply('Por favor, elige una URL de yt valida.');
+			return;
+		}
+
+		// If the video does not exist, stop.
+		let videoInfo;
+		try {
+			videoInfo = await ytdl.getInfo(url);
+			await interaction.reply('Descargando: ' + videoInfo.videoDetails.title);
+		}
+		catch (err) {
+			console.error(err);
+			await interaction.reply('No pudimos descargar tu video.');
+			return;
+		}
 
 
-		// const guild = interaction.client.guilds.cache.get('1155962358645129216');
-		// const member = guild.members.cache.get(interaction.member.user.id);
-		// const voiceChannel = member.voice.channel;
+		// get stream from info
+		const stream = ytdl.downloadFromInfo(videoInfo, {
+			filter: 'audioonly',
+			quality: 'highestaudio',
+			highWaterMark: 1 << 25,
+		});
 
 
-		// const player = createAudioPlayer();
+		// create discord audio resource
+		const resource = createAudioResource(stream, { inlineVolume: true });
+		const player = createAudioPlayer();
 
 
-		// const connection = joinVoiceChannel({
-		// 	channelId: voiceChannel.id,
-		// 	guildId: guild.id,
-		// 	adapterCreator: guild.voiceAdapterCreator,
-		// 	selfDeaf: false,
-		// 	debug: true,
-		// 	selfMute: false,
-		// });
-		// const resource = createAudioResource(join(__dirname, 'audio.mp3'), { inlineVolume   : true });
+		const guild = interaction.client.guilds.cache.get(interaction.guildId);
+		const member = guild.members.cache.get(interaction.member.user.id);
+		const voiceChannel = member.voice.channel;
+		if (!voiceChannel) {
+			interaction.followUp('Por favor, unite a un canal de voz para ejecutar este comando');
+			return;
+		}
 
-		// console.log(join(__dirname, 'audio.mp3'));
-		// resource.volume.setVolume(0.5);
+		const connection = joinVoiceChannel({
+			channelId: voiceChannel.id,
+			guildId: guild.id,
+			adapterCreator: guild.voiceAdapterCreator,
+			selfDeaf: false,
+			selfMute: false,
+		});
 
-		// player.play(resource);
-		// connection.subscribe(player);
+		resource.volume.setVolume(0.3);
 
-		// player.on(AudioPlayerStatus.Playing, () => {
-		// 	console.log('The audio player has started playing!');
-		// });
 
-		// player.on(AudioPlayerStatus.Idle, () => {
-		// 	console.log('The audio player has stopped!');
-		// });
+		connection.subscribe(player);
+
+		connection.on(VoiceConnectionStatus.Ready, () => {
+			console.log('The connection has entered the Ready state - ready to play audio!');
+			player.play(resource);
+			interaction.followUp('Reproduciendo ' + url);
+		});
+
+		player.on(AudioPlayerStatus.Buffering, () => {
+			connection.disconnect();
+		});
 
 
 	},
