@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { joinVoiceChannel, createAudioResource, createAudioPlayer, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioResource, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
-
+const { player } = require('../../logic/player');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -44,8 +44,6 @@ module.exports = {
 
 		// create discord audio resource
 		const resource = createAudioResource(stream, { inlineVolume: true });
-		const player = createAudioPlayer();
-
 
 		const guild = interaction.client.guilds.cache.get(interaction.guildId);
 		const member = guild.members.cache.get(interaction.member.user.id);
