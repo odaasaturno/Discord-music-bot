@@ -17,7 +17,7 @@ module.exports = {
 
 		// if it's not a valid URL, stop.
 		if (!ytdl.validateURL(url)) {
-			await interaction.reply('Por favor, elige una URL de yt valida.');
+			await interaction.reply('Por favor, elige una URL de yt valida૮ ´• ﻌ ´• ა');
 			return;
 		}
 
@@ -29,7 +29,7 @@ module.exports = {
 		}
 		catch (err) {
 			console.error(err);
-			await interaction.reply('No pudimos descargar tu video.');
+			await interaction.reply('No pudimos descargar tu video ᐡ ᐧ ﻌ ᐧ ᐡ');
 			return;
 		}
 
@@ -49,7 +49,7 @@ module.exports = {
 		const member = guild.members.cache.get(interaction.member.user.id);
 		const voiceChannel = member.voice.channel;
 		if (!voiceChannel) {
-			interaction.followUp('Por favor, unite a un canal de voz para ejecutar este comando');
+			interaction.followUp('Por favor, unite a un canal de voz para ejecutar este comandoᐡ ᐧ ﻌ ᐧ ᐡ ');
 			return;
 		}
 
