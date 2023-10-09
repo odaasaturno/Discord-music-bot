@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { joinVoiceChannel, createAudioResource, VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
-const { player } = require('../../logic/player');
+const { player, addToQueue } = require('../../logic/player');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -43,7 +43,7 @@ module.exports = {
 
 
 		// create discord audio resource
-		const resource = createAudioResource(stream, { inlineVolume: true });
+		const song = createAudioResource(stream, { inlineVolume: true });
 
 		const guild = interaction.client.guilds.cache.get(interaction.guildId);
 		const member = guild.members.cache.get(interaction.member.user.id);
@@ -61,20 +61,12 @@ module.exports = {
 			selfMute: false,
 		});
 
-		resource.volume.setVolume(0.3);
+		song.volume.setVolume(0.3);
+		addToQueue(song);
+		interaction.followUp(url + ' agregado a la cola!');
 
 
 		connection.subscribe(player);
-
-		connection.on(VoiceConnectionStatus.Ready, () => {
-			console.log('The connection has entered the Ready state - ready to play audio!');
-			player.play(resource);
-			interaction.followUp('Reproduciendo ' + url);
-		});
-
-		player.on(AudioPlayerStatus.Buffering, () => {
-			connection.disconnect();
-		});
 
 
 	},
