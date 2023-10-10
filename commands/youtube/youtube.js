@@ -14,10 +14,11 @@ module.exports = {
 
 	async execute(interaction) {
 		const url = interaction.options.getString('url');
+		await interaction.deferReply({ ephemeral: true });
 
 		// if it's not a valid URL, stop.
 		if (!ytdl.validateURL(url)) {
-			await interaction.reply('Por favor, elige una URL de yt valida૮ ´• ﻌ ´• ა');
+			await interaction.editReply({ content: 'Por favor, elige una URL de yt valida૮ ´• ﻌ ´• ა', ephemeral: true });
 			return;
 		}
 
@@ -25,11 +26,10 @@ module.exports = {
 		let videoInfo;
 		try {
 			videoInfo = await ytdl.getInfo(url);
-			await interaction.reply('Descargando: ' + videoInfo.videoDetails.title);
 		}
 		catch (err) {
 			console.error(err);
-			await interaction.reply('No pudimos descargar tu video ᐡ ᐧ ﻌ ᐧ ᐡ');
+			await interaction.editReply({ content: 'No pudimos descargar tu video ᐡ ᐧ ﻌ ᐧ ᐡ', ephemeral: true });
 			return;
 		}
 
@@ -49,7 +49,7 @@ module.exports = {
 		const member = guild.members.cache.get(interaction.member.user.id);
 		const voiceChannel = member.voice.channel;
 		if (!voiceChannel) {
-			interaction.followUp('Por favor, unite a un canal de voz para ejecutar este comandoᐡ ᐧ ﻌ ᐧ ᐡ ');
+			interaction.editReply({ content: 'Por favor, unite a un canal de voz para ejecutar este comandoᐡ ᐧ ﻌ ᐧ ᐡ ', ephemeral: true });
 			return;
 		}
 
@@ -62,8 +62,8 @@ module.exports = {
 		});
 
 		song.volume.setVolume(0.3);
-		addToQueue(song);
-		interaction.followUp(url + ' agregado a la cola!');
+		await interaction.editReply({ content: url + ' agregado a la cola!', ephemeral: true });
+		await addToQueue({ resource: song, title: videoInfo.videoDetails.title });
 
 
 		connection.subscribe(player);

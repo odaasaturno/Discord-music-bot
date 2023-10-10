@@ -9,10 +9,10 @@ module.exports = {
 	async execute(interaction) {
 		if (player.state.status === AudioPlayerStatus.Playing) {
 			player.pause();
-			interaction.reply('Pausado૮⍝• ᴥ •⍝ა');
+			interaction.reply({ content: 'Pausado૮⍝• ᴥ •⍝ა', ephemeral: true });
 		}
 		else {
-			interaction.reply('Uy, no hay nada reporduciendose૮・ᵔ・ა');
+			interaction.reply({ content: 'Uy, no hay nada reporduciendose૮・ᵔ・ა', ephemeral: true });
 		}
 	},
 };

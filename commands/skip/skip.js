@@ -9,10 +9,10 @@ module.exports = {
 	async execute(interaction) {
 		if (player.state.status === AudioPlayerStatus.Playing) {
 			player.stop();
-			interaction.reply('Skipeando');
+			interaction.reply({ content: 'Skipeando', ephemeral: true });
 		}
 		else {
-			interaction.reply('No hay nada para skipear');
+			interaction.reply({ content:'No hay nada para skipear', ephemeral: true });
 		}
 	},
 };
