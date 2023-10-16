@@ -1,9 +1,11 @@
+require('dotenv').config();
+
 const fs = require('node:fs');
 const path = require('node:path');
 const { Collection, Events } = require('discord.js');
 const client = require('./logic/bot');
+const TwitchMessageAlert = require('./logic/twitch/twitch-message-alert');
 
-require('dotenv').config();
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -59,3 +61,5 @@ client.on(Events.InteractionCreate, async interaction => {
 		console.error(error);
 	}
 });
+
+TwitchMessageAlert.registerListener()
