@@ -15,7 +15,7 @@ async function sendMessage(e) {
         .setTitle(e.title)
         .setURL(e.url)
         .setAuthor({ name: e.name + ' está en directo 🔴' , iconURL: 'https://cdn.discordapp.com/app-icons/1159251719188922478/204ec78d018280dc676d0e7bfe3841cc.png?size=512', url: e.url })
-        .setImage('https://i.imgur.com/NA6j3LZ.png')
+        .setImage('https://i.pinimg.com/564x/aa/f2/2b/aaf22b723cb6f8184724af19637b00cf.jpg')
         .setFooter({ text: 'Pasate a saludar <3' })
 
 	const channel = await bot.channels.fetch('1163593914058555483');
