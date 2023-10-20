@@ -18,7 +18,7 @@ async function sendMessage(e) {
         .setImage('https://i.pinimg.com/564x/aa/f2/2b/aaf22b723cb6f8184724af19637b00cf.jpg')
         .setFooter({ text: 'Pasate a saludar <3' })
 
-	const channel = await bot.channels.fetch('1163593914058555483');
+	const channel = await bot.channels.fetch('1162520588196261988');
     await channel.send({ embeds: [exampleEmbed] });
 }
 
