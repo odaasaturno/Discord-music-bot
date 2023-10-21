@@ -59,9 +59,12 @@ async function start() {
             const name = e.broadcasterDisplayName;
             const username = e.broadcasterName;
 
+	    console.log(username + ' just went live');
+
             const url = 'https://twitch.tv/' + username;
 
-            const { title } = await e.getStream()
+            const stream = await e.getStream();
+	    const { title } = stream;
 
             const data = {
                 url,
