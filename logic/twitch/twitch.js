@@ -8,7 +8,7 @@ const clientId = process.env.TWITCH_CLIENT_ID;
 const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 
 const adapter = new DirectConnectionAdapter({
-	hostName: 'twitch.raxel.co',
+	hostName: process.env.TWITCH_HOSTNAME,
 	sslCert: {
 		key: fs.readFileSync(process.env.KEY_PATH),
 		cert: fs.readFileSync(process.env.CERT_PATH)
