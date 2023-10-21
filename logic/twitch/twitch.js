@@ -1,34 +1,23 @@
-const { RefreshingAuthProvider, StaticAuthProvider } = require('@twurple/auth')
+const { AppTokenAuthProvider } = require('@twurple/auth');
 const { ApiClient } = require('@twurple/api')
-const { EventSubWsListener } = require('@twurple/eventsub-ws');
+const { DirectConnectionAdapter, EventSubHttpListener } = require('@twurple/eventsub-http');
 const fs = require('fs');
 const { EventEmitter } = require('events');
 
 const clientId = process.env.TWITCH_CLIENT_ID;
 const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 
-let authProvider 
+const adapter = new DirectConnectionAdapter({
+	hostName: 'twitch.raxel.co',
+	sslCert: {
+		key: fs.readFileSync(process.env.KEY_PATH),
+		cert: fs.readFileSync(process.env.CERT_PATH)
+	}
+});
+const secret = process.env.SECRET;
 
-let apiClient;
-
-async function twitchAuth() {
-    const tokenData = JSON.parse(fs.readFileSync('./tokens.494160311.json'));
-    authProvider = new RefreshingAuthProvider(
-        {
-            clientId,
-            clientSecret
-        }
-    );
-
-    authProvider.onRefresh(async (userId, newTokenData) => fs.writeFileSync(`./tokens.${userId}.json`, JSON.stringify(newTokenData, null, 4)));
-
-    const userId = await authProvider.addUserForToken(tokenData);
-    return authProvider.getAnyAccessToken(userId)
-}
-
-async function getAccess() {
-    return twitchAuth()
-}
+const authProvider = new AppTokenAuthProvider(clientId, clientSecret);
+const apiClient = new ApiClient({ authProvider });
 
 const emitter = new EventEmitter();
 
@@ -56,12 +45,7 @@ async function getUserId(twitchUsername) {
 
 let listener;
 async function start() {
-    const { accessToken } = await getAccess();
-
-    const authProvider = new StaticAuthProvider(clientId, accessToken);
-    apiClient = new ApiClient({ authProvider });
-
-    listener = new EventSubWsListener({ apiClient });
+    listener = new EventSubHttpListener({ apiClient, adapter, secret });
 
     const usersConfig = readConfig();
 
@@ -94,7 +78,7 @@ async function start() {
 
 async function reload() {
     listener.stop();
-    listener = new EventSubWsListener({ apiClient });
+    listener = new EventSubHttpListener({ apiClient, adapter, secret });
     await start();
 }
 
