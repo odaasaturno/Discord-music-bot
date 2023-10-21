@@ -45,6 +45,7 @@ function readConfig() {
 async function getUserId(twitchUsername) {
     try {
         const user = await apiClient.users.getUserByName(twitchUsername);
+        if (!user) return;
         return user.id;
     } catch(err) {
         console.error('User with username ' + twitchUsername + ' not found')
